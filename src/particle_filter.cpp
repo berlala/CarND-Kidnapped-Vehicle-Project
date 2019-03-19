@@ -30,8 +30,15 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    * NOTE: Consult particle_filter.h for more information about this method 
    *   (and others in this file).
    */
-  num_particles = 0;  // TODO: Set the number of particles
-
+  num_particles = 100;  // TODO: Set the number of particles
+  //add by bolin 2019/3/19
+  for (int a = 0; a < num_particles; ++a) {
+	  particles[a].x = x + std[0];
+	  particles[a].y = y + std[1];
+	  particles[a].theta = theta +std[2];
+	  particles[a].id = a;
+	  particles[a].weight = 1;
+  }
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 

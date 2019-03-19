@@ -5,6 +5,12 @@
 #include "json.hpp"
 #include "particle_filter.h"
 
+//In this project you will implement a 2 dimensional particle filter in C++. 
+//Your particle filter will be given a map and some initial localization information 
+//(analogous to what a GPS would provide). 
+//At each time step your filter will also get observation and control data.
+
+
 // for convenience
 using nlohmann::json;
 using std::string;
