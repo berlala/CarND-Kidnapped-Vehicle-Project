@@ -20,6 +20,9 @@
 
 using std::string;
 using std::vector;
+using std::normal_distribution;
+using std::default_random_engine;
+
 
 void ParticleFilter::init(double x, double y, double theta, double std[]) {
   /**
@@ -32,13 +35,19 @@ void ParticleFilter::init(double x, double y, double theta, double std[]) {
    */
   num_particles = 100;  // TODO: Set the number of particles
   //add by bolin 2019/3/19
+  default_random_engine rnd;
+  normal_distribution<double> x_init(x, std_pos[0]);
+  normal_distribution<double> y_init(y, std_pos[1]);
+  normal_distribution<double> theta_init(theta, std_pos[2]);
+
   for (int a = 0; a < num_particles; ++a) {
-	  particles[a].x = x + std[0];
-	  particles[a].y = y + std[1];
-	  particles[a].theta = theta +std[2];
+	  particles[a].x = x_init(rnd);
+	  particles[a].y = y_init(rnd);
+	  particles[a].theta = theta_init(rnd);
 	  particles[a].id = a;
 	  particles[a].weight = 1;
   }
+  bool init_flag = 1;
 }
 
 void ParticleFilter::prediction(double delta_t, double std_pos[], 
@@ -50,6 +59,31 @@ void ParticleFilter::prediction(double delta_t, double std_pos[],
    *  http://en.cppreference.com/w/cpp/numeric/random/normal_distribution
    *  http://www.cplusplus.com/reference/random/default_random_engine/
    */
+	default_random_engine rnd;
+	for (int i = 0; i < num_particles; ++i) {
+		double x_pred;
+		double y_pred;
+		double theta_pred;
+		if (yaw_rate < 0.0001) {
+			x_pred = particles[i].x + velocity * cos(particles[i].theta)*delta_t;
+			y_pred = particles[i].y + velocity * sin(particles[i].theta)*delta_t;
+			theta_pred = particles[i].theta;
+		}
+		else {
+			x_pred= particles[i].x + (velocity / yaw_rate) * (sin(particles[i].theta + (yaw_rate * delta_t)) - sin(particles[i].theta));
+			y_pred = particles[i].y + (velocity / yaw_rate) * (cos(particles[i].theta) - cos(particles[i].theta + (yaw_rate * delta_t)));
+			theta_pred = particles[i].theta + (yaw_rate * delta_t); //ref to Lesson 6.8
+		}
+		normal_distribution<double> x_gpred(x_pred, std_pos[0]);
+		normal_distribution<double> y_gpred(y_pred, std_pos[1]);
+		normal_distribution<double> theta_gpred(theta_pred, std_pos[2]);
+
+		particles[i].x = x_gpred(rnd);
+		particles[i].y = y_gpred(rnd);
+		particles[i].theta = theta_gpred(rnd);
+	}
+
+	bool predict_flag = 1;
 
 }
 
@@ -63,7 +97,15 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
    *   probably find it useful to implement this method and use it as a helper 
    *   during the updateWeights phase.
    */
+	for (int i = 0; i < observations.size(); ++i) { //对每一个观测值
+		double x_obs = observations[i].x;
+		double y_obs = observations[i].y;
+		std::vector<double> dist_single_point;
+		for (int ii = 0; ii < predicted.size(); ++ii) {
+			double dist_c = dist(x_obs,y_obs,double predicted[ii].x,double predicted[ii].y)
 
+		}
+	}
 }
 
 void ParticleFilter::updateWeights(double sensor_range, double std_landmark[], 
