@@ -101,10 +101,13 @@ void ParticleFilter::dataAssociation(vector<LandmarkObs> predicted,
 		double x_obs = observations[i].x;
 		double y_obs = observations[i].y;
 		std::vector<double> dist_single_point;
-		for (int ii = 0; ii < predicted.size(); ++ii) {
-			double dist_c = dist(x_obs,y_obs,double predicted[ii].x,double predicted[ii].y)
-
+		for (int ii = 0; ii < predicted.size(); ++ii) { // 对每一个predict的值（为什么是predict）
+			double dist_c = dist(x_obs, y_obs, double predicted[ii].x, double predicted[ii].y)；
+			double dist_single_point[ii] = dist_c;
 		}
+		auto dist_smallest = std::min_element(std::begin(dist_single_point), std::end(dist_single_point));
+		int index_smallest = std::distance(std::begin(dist_single_point), dist_single_point);
+		int observations[i].id = index_smallest; // 该观测对应的index值
 	}
 }
 
